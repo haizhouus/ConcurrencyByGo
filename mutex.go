@@ -3,20 +3,25 @@ import (
     "fmt"
     "sync"
     )
+
 var x  = 0  
-func increment(wg *sync.WaitGroup, m *sync.Mutex) {  
-    m.Lock()
+var c [1000]bool
+var lock sync.Mutex
+
+func increment(i int) {
+    lock.Lock()
     x = x + 1
-    m.Unlock()
-    wg.Done()   
+    lock.Unlock()
+    c[i] = true
 }
+
 func main() {  
-    var w sync.WaitGroup
-    var m sync.Mutex
+
     for i := 0; i < 1000; i++ {
-        w.Add(1)        
-        go increment(&w, &m)
+         go increment(i)
     }
-    w.Wait()
-    fmt.Println("final value of x", x)
+    for i := 0; i < 1000; i++ {
+	for !c[i] {}
+    }
+    fmt.Println("final value of x =", x)
 }
