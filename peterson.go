@@ -10,12 +10,6 @@ type Peterson struct {
 	victim int
 }
 
-
-func NewPeterson () *Peterson {
-	return new(Peterson)
-}
-
-
 func (p *Peterson) lock(me int) {
 
 	p.flag[me] = true
@@ -35,10 +29,10 @@ func keepIncrement(p *Peterson, i int) {
 
 	for j := 0; j < 100; j++ {
 		p.lock(i)
-		defer p.unlock(i)
 		temp := x
-		fmt.Println(x)
+		fmt.Println(i, temp)
 		x = temp + 1
+		p.unlock(i)
 	}
 	c[i] = true
 }
@@ -46,7 +40,7 @@ func keepIncrement(p *Peterson, i int) {
 
 func main() {
 
-	pet := NewPeterson()
+	pet := &Peterson{[2]bool{false, false}, 0}
 
 	for i := 0; i < 2; i++ {
 		go keepIncrement(pet, i)
